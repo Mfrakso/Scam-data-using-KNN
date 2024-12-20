@@ -1,0 +1,33 @@
+The data is loaded from CSV files:
+
+```r
+scamData1 <- read.csv("C:/Users/FRAKMOH/Desktop/R working directory/scamdata1.csv", header = TRUE)
+scamData2 <- read.csv("C:/Users/FRAKMOH/Desktop/R working directory/scamdata2.csv", header = TRUE)
+
+str(scamData1) # Inspect scamData1
+str(scamData2) # Inspect scamData2
+
+library(ggplot2)
+
+# Plotting scamData1
+ggplot(scamData1, aes(x=x, y=y, color = label)) + geom_point(size=0.5)
+
+# Plotting scamData2
+ggplot(scamData2, aes(x=x, y=y, color = label)) + geom_point(size=0.5)
+
+set.seed(20)
+clusters1 <- kmeans(scamData1[,2:3], 3)
+scamData1$Borough <- as.factor(clusters1$cluster)
+
+# Splitting the data into training and test sets
+clusterdata <- sample(1:nrow(scamData1), as.integer(0.5 * nrow(scamData1)))
+trainscamData1 <- scamData1[clusterdata,]
+testscamData1 <- scamData1[-clusterdata,]
+labelscamData1 <- scamData1[-clusterdata, 1]
+
+# Fitting the KNN model
+library(class)
+scamKNN <- knn(train = trainscamData1, test = testscamData1, cl = labelscamData1, k = 3)
+summary(scamKNN)
+
+
